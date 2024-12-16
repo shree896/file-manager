@@ -1,0 +1,206 @@
+The File Manager CLI App is a Node.js project that lets you perform file operations like creating, reading, appending, deleting files, 
+and listing files in the current directory. It uses Node.js core modules like fs (File System) and path.
+
+File Structure
+bash
+Copy code
+file-manager/
+├── commands.js  # Contains functions for file operations
+├── app.js       # Main entry file that handles user input and routes commands
+├── package.json # Node.js metadata and dependency file
+
+1. File: commands.js
+This file contains all the logic for file operations using Node.js's fs (File System) module. Here's the breakdown:
+
+a. Import the required modules
+const fs = require('fs');
+const path = require('path');
+fs: Handles file operations (read, write, delete, etc.).
+path: Helps resolve and manipulate file paths.
+
+b. Create a file
+const createFile = (fileName, content) => {
+  fs.writeFile(fileName, content, (err) => {
+    if (err) {
+      console.error('Error creating file:', err.message);
+      return;
+    }
+    console.log(`File "${fileName}" created successfully.`);
+  });
+};
+fs.writeFile: Creates a new file or overwrites an existing file with the given content.
+Callback: Handles errors (e.g., if the file path is invalid).
+
+c. Read a file
+const readFile = (fileName) => {
+  fs.readFile(fileName, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading file:', err.message);
+      return;
+    }
+    console.log(`Content of "${fileName}":\n${data}`);
+  });
+};
+fs.readFile: Reads the file and returns its content.
+The second argument ('utf8') ensures the content is returned as a string.
+Error Handling: If the file doesn’t exist, an error message is shown.
+
+
+d. Append data to a file
+const appendToFile = (fileName, content) => {
+  fs.appendFile(fileName, content, (err) => {
+    if (err) {
+      console.error('Error appending to file:', err.message);
+      return;
+    }
+    console.log(`Content added to "${fileName}".`);
+  });
+};
+fs.appendFile: Adds content to the end of the file without overwriting existing data.
+
+
+e. Delete a file
+const deleteFile = (fileName) => {
+  fs.unlink(fileName, (err) => {
+    if (err) {
+      console.error('Error deleting file:', err.message);
+      return;
+    }
+    console.log(`File "${fileName}" deleted successfully.`);
+  });
+};
+fs.unlink: Deletes the specified file.
+
+
+f. List files in the current directory
+const listFiles = () => {
+  fs.readdir('.', (err, files) => {
+    if (err) {
+      console.error('Error listing files:', err.message);
+      return;
+    }
+    console.log('Files in the current directory:');
+    files.forEach((file) => console.log(file));
+  });
+};
+fs.readdir: Reads the current directory (.) and returns a list of files.
+
+
+g. Export all functions
+module.exports = { createFile, readFile, appendToFile, deleteFile, listFiles };
+These functions are exported so they can be used in other files (e.g., app.js).
+
+
+2. File: app.js
+This is the main entry point of the app. It handles user input from the command line and calls the appropriate functions from commands.js.
+
+a. Import required modules
+const { createFile, readFile, appendToFile, deleteFile, listFiles } = require('./commands');
+This imports all the file operation functions from commands.js.
+
+
+b. Parse command-line arguments
+const args = process.argv.slice(2);
+const command = args[0];
+const fileName = args[1];
+const content = args[2];
+process.argv: Contains all command-line arguments.
+slice(2): Skips the first two arguments (node and the script name).
+command, fileName, and content are extracted based on user input.
+
+
+c. Handle commands with a switch statement
+switch (command) {
+  case 'create':
+    if (!fileName || !content) {
+      console.log('Usage: create <fileName> <content>');
+    } else {
+      createFile(fileName, content);
+    }
+    break;
+  case 'read':
+    if (!fileName) {
+      console.log('Usage: read <fileName>');
+    } else {
+      readFile(fileName);
+    }
+    break;
+  case 'append':
+    if (!fileName || !content) {
+      console.log('Usage: append <fileName> <content>');
+    } else {
+      appendToFile(fileName, content);
+    }
+    break;
+  case 'delete':
+    if (!fileName) {
+      console.log('Usage: delete <fileName>');
+    } else {
+      deleteFile(fileName);
+    }
+    break;
+  case 'list':
+    listFiles();
+    break;
+  default:
+    console.log('Invalid command. Available commands: create, read, append, delete, list');
+}
+Based on the user’s input (command), the appropriate function from commands.js is called.
+If required arguments (fileName, content) are missing, it shows a usage guide.
+3. File: package.json
+This file stores metadata about the project and its dependencies.
+
+
+
+Generated when running npm init -y:
+{
+  "name": "file-manager",
+  "version": "1.0.0",
+  "description": "A simple CLI app to manage files",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "Your Name",
+  "license": "ISC"
+}
+
+Scripts: You can run the app with npm start instead of node app.js.
+How the App Works
+Here’s an example of how you would use the app:
+
+Create a file:
+
+bash
+
+node app.js create notes.txt "This is my first note"
+Creates notes.txt with the content: "This is my first note".
+Read a file:
+
+bash
+Copy code
+node app.js read notes.txt
+Outputs the content of notes.txt.
+Append to a file:
+
+bash
+Copy code
+node app.js append notes.txt " Adding more notes"
+Adds " Adding more notes" to the end of notes.txt.
+Delete a file:
+
+bash
+Copy code
+node app.js delete notes.txt
+Deletes notes.txt.
+List files in the directory:
+
+bash
+Copy code
+node app.js list
+Lists all files in the current directory.
+What is the Purpose of Each Part?
+commands.js: Encapsulates all file operations, making the code modular and reusable.
+app.js: Handles user input and maps commands to functions in commands.js.
+fs module: Provides the core functionality to interact with files.
+Command-line interface: Allows the user to interact with the app directly from the terminal.
